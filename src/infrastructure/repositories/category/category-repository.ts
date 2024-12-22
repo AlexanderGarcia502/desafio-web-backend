@@ -35,7 +35,6 @@ export class CategoryRepository implements ICategoryRepository {
   }
   async updateCategory({
     idCategoriaProductos,
-    usuarios_idUsuarios,
     estados_idEstados = null,
     nombre = null,
   }: ICategoryWithNullableProps) {
@@ -43,13 +42,11 @@ export class CategoryRepository implements ICategoryRepository {
       await sequelize.query(
         `EXEC p_actualizarCategoriaProductos 
             @idCategoriaProductos = :idCategoriaProductos, 
-            @idUsuarios = :usuarios_idUsuarios, 
             @idEstados = :estados_idEstados, 
             @nombre = :nombre`,
         {
           replacements: {
             idCategoriaProductos,
-            usuarios_idUsuarios,
             estados_idEstados,
             nombre,
           },
@@ -73,15 +70,12 @@ export class CategoryRepository implements ICategoryRepository {
       }
     }
   }
-  async deleteCategory({
-    usuarios_idUsuarios,
-    idCategoriaProductos,
-  }: ICategoryPropertiesForDelete) {
+  async deleteCategory({ idCategoriaProductos }: ICategoryPropertiesForDelete) {
     try {
       await sequelize.query(
-        "EXEC p_eliminarCategoriaProductos :usuarios_idUsuarios, :idCategoriaProductos",
+        "EXEC p_eliminarCategoriaProductos :idCategoriaProductos",
         {
-          replacements: { usuarios_idUsuarios, idCategoriaProductos },
+          replacements: { idCategoriaProductos },
           type: QueryTypes.RAW,
         }
       );
@@ -98,7 +92,7 @@ export class CategoryRepository implements ICategoryRepository {
         throw new Error(sqlError);
       } else {
         console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
+        throw new Error("Error en el servidor. No se pudo eliminar");
       }
     }
   }

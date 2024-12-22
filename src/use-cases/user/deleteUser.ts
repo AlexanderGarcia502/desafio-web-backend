@@ -1,9 +1,7 @@
 import { User } from "../../entities/user";
 import { IUserRepository } from "../repositories/user-repository-interface";
 
-export type IUserPropertiesForDelete = Required<Pick<User, "idUsuarios">> & {
-  idUserToDelete: number;
-};
+export type IUserPropertiesForDelete = Required<Pick<User, "idUsuarios">>;
 
 export class DeleteUser {
   private userRepository: IUserRepository;

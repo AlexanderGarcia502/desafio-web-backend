@@ -6,6 +6,7 @@ export interface IClientProperties {
   telefono: string;
   correo_electronico: string;
   estados_idEstados?: number;
+  usuarios_idUsuarios: number;
 }
 
 export default class Client implements IClientProperties {
@@ -16,6 +17,7 @@ export default class Client implements IClientProperties {
   public telefono: string;
   public correo_electronico: string;
   public estados_idEstados?: number;
+  public usuarios_idUsuarios: number;
   constructor({
     idClientes,
     razon_social,
@@ -24,6 +26,7 @@ export default class Client implements IClientProperties {
     telefono,
     correo_electronico,
     estados_idEstados,
+    usuarios_idUsuarios,
   }: IClientProperties) {
     this.idClientes = idClientes;
     this.razon_social = razon_social;
@@ -32,5 +35,6 @@ export default class Client implements IClientProperties {
     this.telefono = telefono;
     this.correo_electronico = correo_electronico;
     this.estados_idEstados = estados_idEstados;
+    this.usuarios_idUsuarios = usuarios_idUsuarios;
   }
 }

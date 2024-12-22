@@ -2,7 +2,7 @@ import Product from "../../entities/product";
 import { IProductRepository } from "../repositories/product-repository-interface";
 
 export type IProductPropertiesForDelete = Required<
-  Pick<Product, "idProductos" | "usuarios_idUsuarios">
+  Pick<Product, "idProductos">
 >;
 
 export default class DeleteProduct {

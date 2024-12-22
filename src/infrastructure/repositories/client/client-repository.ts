@@ -12,10 +12,11 @@ export default class ClientRepository implements IClientRepository {
     direccion_entrega,
     telefono,
     correo_electronico,
+    usuarios_idUsuarios,
   }: Client) {
     try {
       await sequelize.query(
-        "exec p_insertarCliente :razon_social, :nombre_comercial, :direccion_entrega, :telefono, :correo_electronico",
+        "exec p_insertarCliente :razon_social, :nombre_comercial, :direccion_entrega, :telefono, :correo_electronico, :usuarios_idUsuarios",
         {
           replacements: {
             razon_social,
@@ -23,6 +24,7 @@ export default class ClientRepository implements IClientRepository {
             direccion_entrega,
             telefono,
             correo_electronico,
+            usuarios_idUsuarios,
           },
         }
       );
@@ -39,7 +41,7 @@ export default class ClientRepository implements IClientRepository {
         throw new Error(sqlError);
       } else {
         console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
+        throw new Error("Error en el servidor. No se pudo crear");
       }
     }
   }
@@ -51,6 +53,7 @@ export default class ClientRepository implements IClientRepository {
     direccion_entrega = null,
     telefono = null,
     correo_electronico = null,
+    estados_idEstados = null,
   }: IClientWithNullableProps) {
     try {
       await sequelize.query(
@@ -60,7 +63,9 @@ export default class ClientRepository implements IClientRepository {
               @nombreComercial = :nombre_comercial, 
               @direccionEntrega = :direccion_entrega, 
               @telefono = :telefono, 
-              @correoElectronico = :correo_electronico`,
+              @correoElectronico = :correo_electronico
+              @estados_idEstados = :estados_idEstados`,
+
         {
           replacements: {
             idClientes,
@@ -69,6 +74,7 @@ export default class ClientRepository implements IClientRepository {
             direccion_entrega,
             telefono,
             correo_electronico,
+            estados_idEstados,
           },
           type: QueryTypes.RAW,
         }
@@ -110,7 +116,7 @@ export default class ClientRepository implements IClientRepository {
         throw new Error(sqlError);
       } else {
         console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
+        throw new Error("Error en el servidor. No se pudo eliminar");
       }
     }
   }

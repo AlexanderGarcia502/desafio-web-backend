@@ -1,3 +1,4 @@
+import { Verifier } from "../../../utils/verifier";
 import { Rol } from "../../entities/rol";
 import { IRolRepository } from "../repositories/rol-repository-interface";
 
@@ -6,6 +7,7 @@ export type IRolPropertiesRequiredProps = Required<Rol>;
 export class UpdateRol {
   private rolRepository: IRolRepository;
   private rolInfo: IRolPropertiesRequiredProps;
+  private verifier = new Verifier();
 
   constructor(
     rolRepository: IRolRepository,
@@ -17,10 +19,7 @@ export class UpdateRol {
 
   execute() {
     const { nombre } = this.rolInfo;
-    if (!nombre.trim()) {
-      throw new Error("Casilla nombre requerida.");
-    }
-    if (nombre.trim().length < 3) {
+    if (nombre && this.verifier.isEmpty({ value: nombre, min: 3 })) {
       throw new Error("El nombre no puede ser demasiado corto.");
     }
 

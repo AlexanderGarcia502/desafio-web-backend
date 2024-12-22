@@ -5,15 +5,12 @@ import { IStatusRepository } from "../../../use-cases/repositories/status-reposi
 import { IStatePropertiesRequiredProps } from "../../../use-cases/status/updateStatus";
 
 export class StatusRepository implements IStatusRepository {
-  async saveStatus({ idUsuarios, nombre }: Status) {
+  async saveStatus({ nombre }: Status) {
     try {
-      await sequelize.query(
-        "EXEC p_insertarEstado @idUsuarios = :idUsuarios, @nombre = :nombre",
-        {
-          replacements: { idUsuarios, nombre },
-          type: QueryTypes.RAW,
-        }
-      );
+      await sequelize.query("EXEC p_insertarEstado @nombre = :nombre", {
+        replacements: { nombre },
+        type: QueryTypes.RAW,
+      });
     } catch (err) {
       if (err.name === "SequelizeDatabaseError") {
         const sqlError = err.original;
@@ -31,23 +28,15 @@ export class StatusRepository implements IStatusRepository {
       }
     }
   }
-  async updateStatus({
-    idEstados,
-    idUsuarios,
-    nombre,
-  }: IStatePropertiesRequiredProps) {
+  async updateStatus({ idEstados, nombre }: IStatePropertiesRequiredProps) {
     try {
-      await sequelize.query(
-        "EXEC p_actualizarEstado :idEstados, :idUsuarios, :nombre",
-        {
-          replacements: {
-            idEstados,
-            idUsuarios,
-            nombre,
-          },
-          type: QueryTypes.RAW,
-        }
-      );
+      await sequelize.query("EXEC p_actualizarEstado :idEstados, :nombre", {
+        replacements: {
+          idEstados,
+          nombre,
+        },
+        type: QueryTypes.RAW,
+      });
     } catch (err) {
       if (err.name === "SequelizeDatabaseError") {
         const sqlError = err.original;
@@ -61,7 +50,7 @@ export class StatusRepository implements IStatusRepository {
         throw new Error(sqlError);
       } else {
         console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
+        throw new Error("Error en el servidor. No se pudo actualizar");
       }
     }
   }

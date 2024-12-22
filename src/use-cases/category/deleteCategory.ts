@@ -2,7 +2,7 @@ import { Category } from "../../entities/category";
 import { ICategoryRepository } from "../repositories/category-repository-interface";
 
 export type ICategoryPropertiesForDelete = Required<
-  Pick<Category, "idCategoriaProductos" | "usuarios_idUsuarios">
+  Pick<Category, "idCategoriaProductos">
 >;
 
 export class DeleteCategory {

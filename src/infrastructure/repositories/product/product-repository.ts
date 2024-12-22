@@ -104,18 +104,12 @@ export class ProductRepository implements IProductRepository {
     }
   }
 
-  async deleteProduct({
-    usuarios_idUsuarios,
-    idProductos,
-  }: IProductPropertiesForDelete) {
+  async deleteProduct({ idProductos }: IProductPropertiesForDelete) {
     try {
-      await sequelize.query(
-        "EXEC p_eliminarProducto :usuarios_idUsuarios, :idProductos",
-        {
-          replacements: { usuarios_idUsuarios, idProductos },
-          type: QueryTypes.RAW,
-        }
-      );
+      await sequelize.query("EXEC p_eliminarProducto :idProductos", {
+        replacements: { idProductos },
+        type: QueryTypes.RAW,
+      });
     } catch (err) {
       if (err.name === "SequelizeDatabaseError") {
         const sqlError = err.original;
@@ -129,7 +123,7 @@ export class ProductRepository implements IProductRepository {
         throw new Error(sqlError);
       } else {
         console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
+        throw new Error("Error en el servidor. No se pudo eliminar");
       }
     }
   }

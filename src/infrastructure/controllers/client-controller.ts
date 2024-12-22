@@ -15,6 +15,7 @@ router.post("/", async (req: Request, res: Response) => {
       direccion_entrega,
       telefono,
       correo_electronico,
+      usuarios_idUsuarios,
     } = req.body;
 
     await clientService.save({
@@ -23,6 +24,7 @@ router.post("/", async (req: Request, res: Response) => {
       direccion_entrega,
       telefono,
       correo_electronico,
+      usuarios_idUsuarios,
     });
     res
       .status(200)

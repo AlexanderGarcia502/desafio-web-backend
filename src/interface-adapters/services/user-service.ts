@@ -4,6 +4,7 @@ import {
   DeleteUser,
   IUserPropertiesForDelete,
 } from "../../use-cases/user/deleteUser";
+import { ICredentials, Login } from "../../use-cases/user/login";
 import { SaveUser } from "../../use-cases/user/saveUser";
 import {
   IUserWithNullableProps,
@@ -27,5 +28,9 @@ export class UserService {
   delete = (userInfo: IUserPropertiesForDelete) => {
     const deleteUser = new DeleteUser(this.userRepository, userInfo);
     return deleteUser.execute();
+  };
+  login = (credentials: ICredentials) => {
+    const login = new Login(this.userRepository, credentials);
+    return login.execute();
   };
 }

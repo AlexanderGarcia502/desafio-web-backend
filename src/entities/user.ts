@@ -7,7 +7,6 @@ interface IUserProperties {
   password: string;
   telefono: string;
   fecha_nacimiento: Date;
-  clientes_idClientes: number;
 }
 
 export class User implements IUserProperties {
@@ -19,7 +18,6 @@ export class User implements IUserProperties {
   public password: string;
   public telefono: string;
   public fecha_nacimiento: Date;
-  public clientes_idClientes: number;
 
   constructor({
     idUsuarios,
@@ -30,7 +28,6 @@ export class User implements IUserProperties {
     password,
     telefono,
     fecha_nacimiento,
-    clientes_idClientes,
   }: IUserProperties) {
     this.idUsuarios = idUsuarios;
     this.rol_idRol = rol_idRol;
@@ -40,6 +37,5 @@ export class User implements IUserProperties {
     this.password = password;
     this.telefono = telefono;
     this.fecha_nacimiento = fecha_nacimiento;
-    this.clientes_idClientes = clientes_idClientes;
   }
 }
