@@ -127,4 +127,31 @@ export class ProductRepository implements IProductRepository {
       }
     }
   }
+
+  async getAllProducts(): Promise<Product[]> {
+    try {
+      const products = await sequelize.query("EXEC p_obtenerProductos", {
+        type: QueryTypes.SELECT,
+      });
+
+      return products as Product[];
+    } catch (err) {
+      if (err.name === "SequelizeDatabaseError") {
+        const sqlError = err.original;
+        console.log("Mensaje de error desde SQL Server:", sqlError.message);
+
+        console.log("Código de error:", sqlError.code);
+        console.log("Número del error:", sqlError.number);
+        console.log("Estado del error:", sqlError.state);
+        console.log("Pila de errores:", sqlError.stack);
+
+        throw new Error(sqlError);
+      } else {
+        console.log("Error >> ", err);
+        throw new Error(
+          "Error en el servidor. No se pudo obtener los productos"
+        );
+      }
+    }
+  }
 }

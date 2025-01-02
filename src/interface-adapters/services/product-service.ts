@@ -2,6 +2,7 @@ import Product from "../../entities/product";
 import DeleteProduct, {
   IProductPropertiesForDelete,
 } from "../../use-cases/product/deleteProduct";
+import GetProducts from "../../use-cases/product/getProducts";
 import SaveProduct from "../../use-cases/product/saveProduct";
 import UpdateProduct, {
   IProductWithNullableProps,
@@ -31,5 +32,9 @@ export class ProductService {
       productInfo
     );
     return deleteProduct.execute();
+  };
+  getAllProducts = () => {
+    const getAllProducts = new GetProducts(this.productRepository);
+    return getAllProducts.execute();
   };
 }

@@ -8,6 +8,18 @@ const productService = new ProductService(productRepository);
 
 const router = Router();
 
+router.get("/getAll", async (req: Request, res: Response) => {
+  try {
+    const products = await productService.getAllProducts();
+    res.status(200).send({ success: true, data: products });
+  } catch (err) {
+    console.log("* error", err);
+    res
+      .status(400)
+      .send({ success: false, message: err?.message || "server error" });
+  }
+});
+
 router.post(
   "/",
   JwtMiddleware.verifyToken,

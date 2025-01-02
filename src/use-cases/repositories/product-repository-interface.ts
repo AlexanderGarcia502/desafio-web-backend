@@ -6,5 +6,5 @@ export interface IProductRepository {
   saveProduct: (product: Product) => void;
   updateProduct: (product: IProductWithNullableProps) => void;
   deleteProduct: (product: IProductPropertiesForDelete) => void;
-  getProductByID?: () => Promise<Product>;
+  getAllProducts: () => Promise<Product[]>;
 }

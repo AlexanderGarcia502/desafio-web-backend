@@ -1,8 +1,11 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
+interface IUserRequest extends Request {
+  user?: JwtPayload;
+}
 export class JwtMiddleware {
-  static verifyToken(req: Request, res: Response, next: NextFunction) {
+  static verifyToken(req: IUserRequest, res: Response, next: NextFunction) {
     const token = req.cookies.access_token;
 
     if (!token) {
@@ -19,7 +22,7 @@ export class JwtMiddleware {
         process.env.SECRET_JWT_KEY || ""
       ) as JwtPayload;
 
-      (req as any).user = decoded;
+      req.user = decoded;
       next();
     } catch (error) {
       return res.status(401).json({
