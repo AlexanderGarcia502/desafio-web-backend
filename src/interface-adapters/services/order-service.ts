@@ -1,5 +1,6 @@
 import { Order } from "../../entities/order";
 import { OrderDetail } from "../../entities/order-detail";
+import GetOrderList from "../../use-cases/order/getOrderList";
 import SaveOrder from "../../use-cases/order/saveOrder";
 import UpdateOrder, {
   IOrderWithNullableProps,
@@ -18,7 +19,11 @@ export class OrderService {
     this.orderRepository = orderRepository;
     this.orderDetailRepository = orderDetailRepository;
   }
-  save(orderInfo: Order & Pick<OrderDetail, "productsDetails">) {
+  save(
+    orderInfo: Order & {
+      productsDetails: Omit<OrderDetail, "idOrdenDetalles">[];
+    }
+  ) {
     const saveOrder = new SaveOrder(
       this.orderRepository,
       this.orderDetailRepository,
@@ -29,5 +34,9 @@ export class OrderService {
   update(orderInfo: IOrderWithNullableProps) {
     const updateOrder = new UpdateOrder(this.orderRepository, orderInfo);
     return updateOrder.execute();
+  }
+  getAll() {
+    const getAllOrders = new GetOrderList(this.orderRepository);
+    return getAllOrders.execute();
   }
 }

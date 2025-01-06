@@ -8,13 +8,17 @@ export default class SaveOrder {
   private orderRepository: IOrderRepository;
   private orderDetailRepository: IOrderDetailRepository;
 
-  private orderInfo: Order & Pick<OrderDetail, "productsDetails">;
+  private orderInfo: Order & {
+    productsDetails: Omit<OrderDetail, "orden_idOrden">[];
+  };
   private verifier = new Verifier();
 
   constructor(
     orderRepository: IOrderRepository,
     orderDetailRepository: IOrderDetailRepository,
-    orderInfo: Order & Pick<OrderDetail, "productsDetails">
+    orderInfo: Order & {
+      productsDetails: Omit<OrderDetail, "orden_idOrden">[];
+    }
   ) {
     this.orderRepository = orderRepository;
     this.orderDetailRepository = orderDetailRepository;

@@ -2,6 +2,7 @@ import { QueryTypes } from "sequelize";
 import { sequelize } from "../../shared/database/connect";
 import {
   IOrderRepository,
+  IOrderWithDetails,
   ISaveOrderResult,
 } from "../../../use-cases/repositories/order-repository-interface";
 import { Order } from "../../../entities/order";
@@ -9,6 +10,25 @@ import { IOrderWithNullableProps } from "../../../use-cases/order/updateOrder";
 import { controlError } from "../../../../utils/controlError";
 
 export class OrderRepository implements IOrderRepository {
+  async getOrderList() {
+    try {
+      const result = await sequelize.query(`EXEC p_obtenerOrdenConDetalles`);
+      const [ordersWithDetails]: [IOrderWithDetails[], unknown] = result as [
+        IOrderWithDetails[],
+        unknown
+      ];
+      const orderMapped = ordersWithDetails.map((order) => ({
+        ...order,
+        detallesOrden: JSON.parse(order.detallesOrden),
+      }));
+
+      return orderMapped;
+    } catch (err) {
+      console.log("ERR: ", err);
+      return controlError(err);
+    }
+  }
+
   async saveOrder({
     usuarios_idUsuarios,
     nombre_completo,

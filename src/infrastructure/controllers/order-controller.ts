@@ -12,6 +12,24 @@ const orderService = new OrderService(orderRepository, orderDetailRepository);
 
 const router = Router();
 
+router.get("/getAll", async (req: Request, res: Response) => {
+  try {
+    const result = await orderService.getAll();
+
+    console.log("result order list ", result);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    console.log("* error", err);
+    res
+      .status(400)
+      .send({ success: false, message: err?.message || "server error" });
+  }
+});
+
 router.post(
   "/",
   JwtMiddleware.verifyToken,
