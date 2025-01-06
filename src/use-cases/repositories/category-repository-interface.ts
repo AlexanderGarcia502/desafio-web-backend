@@ -6,4 +6,5 @@ export interface ICategoryRepository {
   saveCategory: (categoryInfo: Category) => void;
   updateCategory: (categoryInfo: ICategoryWithNullableProps) => void;
   deleteCategory: (category: ICategoryPropertiesForDelete) => void;
+  getAllCategories: () => Promise<Category[]>;
 }

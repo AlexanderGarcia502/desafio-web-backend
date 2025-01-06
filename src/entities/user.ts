@@ -1,3 +1,9 @@
+export enum Roles {
+  Admin = "Administrador",
+  Operator = "Operador",
+  Client = "Usuario Comercial",
+}
+
 interface IUserProperties {
   idUsuarios?: number;
   rol_idRol: number;

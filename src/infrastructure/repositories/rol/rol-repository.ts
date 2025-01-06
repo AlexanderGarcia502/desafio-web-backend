@@ -3,6 +3,7 @@ import { sequelize } from "../../shared/database/connect";
 import { IRolRepository } from "../../../use-cases/repositories/rol-repository-interface";
 import { Rol } from "../../../entities/rol";
 import { IRolPropertiesRequiredProps } from "../../../use-cases/rol/updateRol";
+import { controlError } from "../../../../utils/controlError";
 
 export class RolRepository implements IRolRepository {
   async saveRol({ nombre }: Rol) {
@@ -12,20 +13,7 @@ export class RolRepository implements IRolRepository {
         type: QueryTypes.RAW,
       });
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
-      }
+      return controlError(err);
     }
   }
   async updateRol({ idRol, nombre }: IRolPropertiesRequiredProps) {
@@ -38,20 +26,7 @@ export class RolRepository implements IRolRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
-      }
+      return controlError(err);
     }
   }
 }

@@ -2,6 +2,7 @@ import { Router, Response, Request } from "express";
 import { StatusRepository } from "../repositories/status/status-repository";
 import { StatusService } from "../../interface-adapters/services/status-service";
 import { JwtMiddleware } from "../shared/jwt/JwtMiddleware";
+import { Roles } from "../../entities/user";
 
 const router = Router();
 const statusRepository = new StatusRepository();
@@ -10,7 +11,7 @@ const statusService = new StatusService(statusRepository);
 router.post(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const { nombre } = req.body;
@@ -34,7 +35,7 @@ router.post(
 router.put(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     const { idEstados, nombre } = req.body;
     try {

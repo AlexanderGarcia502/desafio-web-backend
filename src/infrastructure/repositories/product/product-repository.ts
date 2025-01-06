@@ -4,6 +4,7 @@ import { IProductRepository } from "../../../use-cases/repositories/product-repo
 import Product from "../../../entities/product";
 import { IProductWithNullableProps } from "../../../use-cases/product/updateProduct";
 import { IProductPropertiesForDelete } from "../../../use-cases/product/deleteProduct";
+import { controlError } from "../../../../utils/controlError";
 
 export class ProductRepository implements IProductRepository {
   async saveProduct({
@@ -26,7 +27,7 @@ export class ProductRepository implements IProductRepository {
                 @codigo = :codigo, 
                 @stock = :stock, 
                 @precio = :precio, 
-                @foto = ${0x0000}`,
+                @foto = :foto`,
         {
           replacements: {
             categoriaProductos_idCategoriaProductos,
@@ -42,20 +43,7 @@ export class ProductRepository implements IProductRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
-      }
+      return controlError(err);
     }
   }
 
@@ -87,20 +75,7 @@ export class ProductRepository implements IProductRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
-      }
+      return controlError(err);
     }
   }
 
@@ -111,47 +86,45 @@ export class ProductRepository implements IProductRepository {
         type: QueryTypes.RAW,
       });
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo eliminar");
-      }
+      return controlError(err);
     }
   }
 
-  async getAllProducts(): Promise<Product[]> {
+  async getAllProducts(): Promise<
+    (Omit<Product, "foto"> & { foto: string | null })[]
+  > {
     try {
-      const products = await sequelize.query("EXEC p_obtenerProductos", {
+      const products = (await sequelize.query("EXEC p_obtenerProductos", {
         type: QueryTypes.SELECT,
+      })) as unknown as Product[];
+
+      if (!products || products.length === 0) {
+        console.log("No se encontraron productos en la base de datos.");
+        return [];
+      }
+
+      const productsWithBase64Photo = products.map((product: Product) => {
+        const { foto, ...rest } = product;
+
+        if (Buffer.isBuffer(foto)) {
+          const imageBase64 = `data:image/jpeg;base64,${foto.toString(
+            "base64"
+          )}`;
+          return {
+            ...rest,
+            foto: imageBase64,
+          };
+        }
+
+        return {
+          ...rest,
+          foto: null,
+        };
       });
 
-      return products as Product[];
+      return productsWithBase64Photo;
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error(
-          "Error en el servidor. No se pudo obtener los productos"
-        );
-      }
+      return controlError(err);
     }
   }
 }

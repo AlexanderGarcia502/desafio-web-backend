@@ -42,7 +42,7 @@ export default class UpdateProduct {
     ) {
       throw new Error("El nombre y marca no pueden ser demasiado cortos.");
     }
-    if (!Number.isInteger(stock)) {
+    if (stock && !Number.isInteger(stock)) {
       throw new Error("Stock debe ser numero entero.");
     }
 

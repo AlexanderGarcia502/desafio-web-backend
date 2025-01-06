@@ -1,6 +1,9 @@
 import { Verifier } from "../../../utils/verifier";
 import { User } from "../../entities/user";
-import { IUserRepository } from "../repositories/user-repository-interface";
+import {
+  ILoginReturn,
+  IUserRepository,
+} from "../repositories/user-repository-interface";
 
 export interface ICredentials {
   correo_electronico: string;
@@ -17,7 +20,7 @@ export class Login {
     this.credentials = credentials;
   }
 
-  async execute(): Promise<Omit<User, "password">> {
+  async execute(): Promise<ILoginReturn> {
     const { correo_electronico, password } = this.credentials;
     if (
       this.verifier.isEmpty({ value: correo_electronico }) ||

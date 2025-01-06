@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { UserRepository } from "../repositories/user/user-repository";
 import { UserService } from "../../interface-adapters/services/user-service";
 import { JwtMiddleware } from "../shared/jwt/JwtMiddleware";
+import { Roles } from "../../entities/user";
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
@@ -79,6 +80,7 @@ router.put(
 router.delete(
   "/",
   JwtMiddleware.verifyToken,
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const { idUsuarios } = req.body;
@@ -110,20 +112,12 @@ router.post("/login", async (req: Request, res: Response) => {
       {
         idUser: user.idUsuarios,
         userName: user.nombre_completo,
-        rol: user.rol_idRol,
+        rol: user.rol,
       },
       process.env.SECRET_JWT_KEY as string,
       { expiresIn: "1h" }
     );
-    res
-      .cookie("access_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60,
-      })
-      .status(200)
-      .send({ success: true, data: user });
+    res.status(200).send({ success: true, data: { ...user, token } });
   } catch (err) {
     console.log("* error", err);
     res

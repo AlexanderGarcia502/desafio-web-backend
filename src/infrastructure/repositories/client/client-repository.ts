@@ -1,3 +1,4 @@
+import { controlError } from "../../../../utils/controlError";
 import Client from "../../../entities/client";
 import { IClientPropertiesForDelete } from "../../../use-cases/client/deleteClient";
 import { IClientWithNullableProps } from "../../../use-cases/client/updateClient";
@@ -29,20 +30,7 @@ export default class ClientRepository implements IClientRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
-      }
+      return controlError(err);
     }
   }
 
@@ -80,20 +68,7 @@ export default class ClientRepository implements IClientRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
-      }
+      return controlError(err);
     }
   }
 
@@ -104,20 +79,7 @@ export default class ClientRepository implements IClientRepository {
         type: QueryTypes.RAW,
       });
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo eliminar");
-      }
+      return controlError(err);
     }
   }
 }

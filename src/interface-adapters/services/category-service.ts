@@ -3,6 +3,7 @@ import {
   DeleteCategory,
   ICategoryPropertiesForDelete,
 } from "../../use-cases/category/deleteCategory";
+import { getCategories } from "../../use-cases/category/getCategories";
 import { SaveCategory } from "../../use-cases/category/saveCategory";
 import {
   ICategoryWithNullableProps,
@@ -38,4 +39,8 @@ export class CategoryService {
     );
     return deleteCategory.execute();
   }
+  getAllCategories = () => {
+    const getAllCategories = new getCategories(this.categoryRepository);
+    return getAllCategories.execute();
+  };
 }

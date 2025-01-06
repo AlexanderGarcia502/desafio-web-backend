@@ -6,9 +6,8 @@ interface IUserRequest extends Request {
 }
 export class JwtMiddleware {
   static verifyToken(req: IUserRequest, res: Response, next: NextFunction) {
-    const token = req.cookies.access_token;
-
-    if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
       return res.status(401).json({
         success: false,
         message:
@@ -16,12 +15,15 @@ export class JwtMiddleware {
       });
     }
 
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
     try {
       const decoded = jwt.verify(
         token,
         process.env.SECRET_JWT_KEY || ""
       ) as JwtPayload;
-
       req.user = decoded;
       next();
     } catch (error) {
@@ -32,7 +34,7 @@ export class JwtMiddleware {
     }
   }
 
-  static hasRole(allowedRoles: number[]) {
+  static hasRole(allowedRoles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
         const user = (req as any).user;
@@ -44,7 +46,7 @@ export class JwtMiddleware {
           });
         }
 
-        if (!allowedRoles.includes(user.rol)) {
+        if (!allowedRoles.includes(user.rol.trim())) {
           return res.status(403).json({
             success: false,
             message: "No tienes permisos para acceder a este recurso.",

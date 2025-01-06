@@ -1,19 +1,33 @@
 import { Verifier } from "../../../utils/verifier";
 import { Order } from "../../entities/order";
+import { OrderDetail } from "../../entities/order-detail";
+import { IOrderDetailRepository } from "../repositories/order-detail-repository-interface";
 import { IOrderRepository } from "../repositories/order-repository-interface";
 
 export default class SaveOrder {
   private orderRepository: IOrderRepository;
-  private orderInfo: Order;
+  private orderDetailRepository: IOrderDetailRepository;
+
+  private orderInfo: Order & Pick<OrderDetail, "productsDetails">;
   private verifier = new Verifier();
 
-  constructor(orderRepository: IOrderRepository, orderInfo: Order) {
+  constructor(
+    orderRepository: IOrderRepository,
+    orderDetailRepository: IOrderDetailRepository,
+    orderInfo: Order & Pick<OrderDetail, "productsDetails">
+  ) {
     this.orderRepository = orderRepository;
+    this.orderDetailRepository = orderDetailRepository;
     this.orderInfo = orderInfo;
   }
-  execute() {
-    const { nombre_completo, direccion, telefono, correo_electronico } =
-      this.orderInfo;
+  async execute() {
+    const {
+      nombre_completo,
+      direccion,
+      telefono,
+      correo_electronico,
+      productsDetails,
+    } = this.orderInfo;
 
     if (
       this.verifier.isEmpty({ value: nombre_completo }) ||
@@ -34,7 +48,16 @@ export default class SaveOrder {
       throw new Error("Número de teléfono no valido");
     }
 
-    const saveOrder = this.orderRepository.saveOrder(this.orderInfo);
-    return saveOrder;
+    if (productsDetails.length < 1) {
+      throw new Error("No hay productos en su carrito");
+    }
+
+    const newOrder = await this.orderRepository.saveOrder(this.orderInfo);
+
+    await this.orderDetailRepository.saveOrderDetail({
+      orden_idOrden: newOrder.idOrden,
+      productsDetails: productsDetails,
+    });
+    return newOrder;
   }
 }

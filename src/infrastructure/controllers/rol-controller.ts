@@ -2,6 +2,7 @@ import { Router, Response, Request } from "express";
 import { RolRepository } from "../repositories/rol/rol-repository";
 import { RolService } from "../../interface-adapters/services/rol-service";
 import { JwtMiddleware } from "../shared/jwt/JwtMiddleware";
+import { Roles } from "../../entities/user";
 
 const router = Router();
 const rolRepository = new RolRepository();
@@ -10,7 +11,7 @@ const rolService = new RolService(rolRepository);
 router.post(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const { nombre } = req.body;
@@ -34,7 +35,7 @@ router.post(
 router.put(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const { nombre, idRol } = req.body;

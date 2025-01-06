@@ -5,6 +5,7 @@ import { Category } from "../../../entities/category";
 import { ICategoryRepository } from "../../../use-cases/repositories/category-repository-interface";
 import { ICategoryWithNullableProps } from "../../../use-cases/category/updateCategory";
 import { ICategoryPropertiesForDelete } from "../../../use-cases/category/deleteCategory";
+import { controlError } from "../../../../utils/controlError";
 
 export class CategoryRepository implements ICategoryRepository {
   async saveCategory({ usuarios_idUsuarios, nombre }: Category) {
@@ -17,20 +18,7 @@ export class CategoryRepository implements ICategoryRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
-      }
+      return controlError(err);
     }
   }
   async updateCategory({
@@ -54,20 +42,7 @@ export class CategoryRepository implements ICategoryRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
-      }
+      return controlError(err);
     }
   }
   async deleteCategory({ idCategoriaProductos }: ICategoryPropertiesForDelete) {
@@ -80,20 +55,17 @@ export class CategoryRepository implements ICategoryRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo eliminar");
-      }
+      return controlError(err);
+    }
+  }
+  async getAllCategories() {
+    try {
+      const categories = await sequelize.query("EXEC p_obtenerCategorias", {
+        type: QueryTypes.SELECT,
+      });
+      return categories as Category[];
+    } catch (err) {
+      return controlError(err);
     }
   }
 }

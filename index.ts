@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { sequelize } from "./src/infrastructure/shared/database/connect";
@@ -18,6 +19,7 @@ const app = express();
   connectDB();
 })();
 app.use(express.json());
+app.use(cors());
 app.use(cookieParser());
 
 app.use("/api/client", clientController);

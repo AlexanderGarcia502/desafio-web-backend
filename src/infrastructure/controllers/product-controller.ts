@@ -1,29 +1,37 @@
 import { Router, Request, Response } from "express";
+import multer from "multer";
 import { ProductRepository } from "../repositories/product/product-repository";
 import { ProductService } from "../../interface-adapters/services/product-service";
 import { JwtMiddleware } from "../shared/jwt/JwtMiddleware";
+import { Roles } from "../../entities/user";
 
 const productRepository = new ProductRepository();
 const productService = new ProductService(productRepository);
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
-router.get("/getAll", async (req: Request, res: Response) => {
-  try {
-    const products = await productService.getAllProducts();
-    res.status(200).send({ success: true, data: products });
-  } catch (err) {
-    console.log("* error", err);
-    res
-      .status(400)
-      .send({ success: false, message: err?.message || "server error" });
+router.get(
+  "/getAll",
+  JwtMiddleware.verifyToken,
+  async (req: Request, res: Response) => {
+    try {
+      const products = await productService.getAllProducts();
+      res.status(200).send({ success: true, data: products });
+    } catch (err) {
+      console.log("* error", err);
+      res
+        .status(400)
+        .send({ success: false, message: err?.message || "server error" });
+    }
   }
-});
+);
 
 router.post(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1, 3]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
+  upload.single("foto"),
   async (req: Request, res: Response) => {
     try {
       const {
@@ -34,8 +42,9 @@ router.post(
         codigo,
         stock,
         precio,
-        foto,
       } = req.body;
+
+      const foto = req.file!.buffer;
 
       await productService.save({
         categoriaProductos_idCategoriaProductos,
@@ -62,7 +71,8 @@ router.post(
 router.put(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1, 3]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
+  upload.single("foto"),
   async (req: Request, res: Response) => {
     try {
       const {
@@ -73,8 +83,9 @@ router.put(
         marca,
         stock,
         precio,
-        foto,
       } = req.body;
+
+      const foto = req.file ? req.file.buffer : null;
 
       await productService.update({
         idProductos,
@@ -101,7 +112,7 @@ router.put(
 router.delete(
   "/",
   JwtMiddleware.verifyToken,
-  JwtMiddleware.hasRole([1, 3]),
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const { idProductos } = req.body;

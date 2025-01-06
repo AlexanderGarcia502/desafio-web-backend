@@ -1,11 +1,15 @@
 import { QueryTypes } from "sequelize";
 import bcrypt from "bcrypt";
 import { User } from "../../../entities/user";
-import { IUserRepository } from "../../../use-cases/repositories/user-repository-interface";
+import {
+  ILoginReturn,
+  IUserRepository,
+} from "../../../use-cases/repositories/user-repository-interface";
 import { sequelize } from "../../shared/database/connect";
 import { IUserWithNullableProps } from "../../../use-cases/user/updateUser";
 import { IUserPropertiesForDelete } from "../../../use-cases/user/deleteUser";
 import { ICredentials } from "../../../use-cases/user/login";
+import { controlError } from "../../../../utils/controlError";
 
 export class UserRepository implements IUserRepository {
   async saveUser({
@@ -33,20 +37,7 @@ export class UserRepository implements IUserRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo crear");
-      }
+      return controlError(err);
     }
   }
   async updateUser({
@@ -85,20 +76,7 @@ export class UserRepository implements IUserRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo actualizar");
-      }
+      return controlError(err);
     }
   }
   async deleteUser({ idUsuarios }: IUserPropertiesForDelete) {
@@ -111,26 +89,13 @@ export class UserRepository implements IUserRepository {
         }
       );
     } catch (err) {
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error("Error en el servidor. No se pudo eliminar");
-      }
+      return controlError(err);
     }
   }
   async login({
     correo_electronico,
-    password,
-  }: ICredentials): Promise<Omit<User, "password">> {
+    password: passwordEntered,
+  }: ICredentials): Promise<ILoginReturn> {
     try {
       const result = await sequelize.query(
         "EXEC p_loginUsuario @correo_electronico=:correo_electronico",
@@ -140,34 +105,24 @@ export class UserRepository implements IUserRepository {
         }
       );
 
-      const user = result[0] as User;
+      const user = result[0] as Omit<User, "rol_idRol">;
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(
+        passwordEntered,
+        user.password
+      );
 
       if (!isPasswordValid) {
         throw new Error("Correo electrónico o contraseña incorrectos");
       }
 
+      const { password, ...userWithoutPassword } = user;
+
       return {
-        ...user,
-        password: undefined,
-      } as Omit<User, "password">;
+        ...userWithoutPassword,
+      } as ILoginReturn;
     } catch (err) {
-      console.log("error detallado: ", err);
-      if (err.name === "SequelizeDatabaseError") {
-        const sqlError = err.original;
-        console.log("Mensaje de error desde SQL Server:", sqlError.message);
-
-        console.log("Código de error:", sqlError.code);
-        console.log("Número del error:", sqlError.number);
-        console.log("Estado del error:", sqlError.state);
-        console.log("Pila de errores:", sqlError.stack);
-
-        throw new Error(sqlError);
-      } else {
-        console.log("Error >> ", err);
-        throw new Error(err);
-      }
+      return controlError(err);
     }
   }
 }
