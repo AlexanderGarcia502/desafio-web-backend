@@ -10,7 +10,6 @@ import categoryController from "./src/infrastructure/controllers/category-contro
 import statusController from "./src/infrastructure/controllers/status-controller";
 import rolController from "./src/infrastructure/controllers/rol-controller";
 import orderController from "./src/infrastructure/controllers/order-controller";
-import orderDetailController from "./src/infrastructure/controllers/order-detail-controller";
 
 dotenv.config();
 const app = express();
@@ -29,7 +28,6 @@ app.use("/api/category", categoryController);
 app.use("/api/status", statusController);
 app.use("/api/rol", rolController);
 app.use("/api/order", orderController);
-app.use("/api/orderDetail", orderDetailController);
 
 app.listen(process.env.PORT, () => {
   console.log(`corriendo en el puerto ${process.env.PORT}`);
