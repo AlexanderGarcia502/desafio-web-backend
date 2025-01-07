@@ -8,6 +8,8 @@ import {
 import { Order } from "../../../entities/order";
 import { IOrderWithNullableProps } from "../../../use-cases/order/updateOrder";
 import { controlError } from "../../../../utils/controlError";
+import { OrderDetail } from "../../../entities/order-detail";
+import Product from "../../../entities/product";
 
 export class OrderRepository implements IOrderRepository {
   async getOrderList() {
@@ -17,10 +19,24 @@ export class OrderRepository implements IOrderRepository {
         IOrderWithDetails[],
         unknown
       ];
-      const orderMapped = ordersWithDetails.map((order) => ({
-        ...order,
-        detallesOrden: JSON.parse(order.detallesOrden),
-      }));
+      const orderMapped = ordersWithDetails.map((order) => {
+        const parsedDetails = JSON.parse(order.detallesOrden) || [];
+
+        const parsedProduct = parsedDetails.map(
+          (
+            details: Omit<OrderDetail, "orden_idOrden"> & { producto: string }
+          ) => {
+            return { ...details, producto: JSON.parse(details.producto) };
+          }
+        );
+
+        const orderDetails = parsedProduct;
+        
+        return {
+          ...order,
+          detallesOrden: orderDetails,
+        };
+      });
 
       return orderMapped;
     } catch (err) {
