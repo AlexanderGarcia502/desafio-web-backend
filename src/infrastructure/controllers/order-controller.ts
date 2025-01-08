@@ -124,4 +124,24 @@ router.post(
   }
 );
 
+router.get(
+  "/getHistoryUser",
+  JwtMiddleware.verifyToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { idUsuario } = req.query;
+      console.log('id: ', idUsuario)
+      const history = await orderService.getHistoryClient(Number(idUsuario));
+      res
+        .status(200)
+        .send({ success: true, data: history });
+    } catch (err) {
+      console.log("* error", err);
+      res
+        .status(400)
+        .send({ success: false, message: err?.message || "server error" });
+    }
+  }
+);
+
 export default router;

@@ -2,6 +2,7 @@ import { QueryTypes } from "sequelize";
 import { sequelize } from "../../shared/database/connect";
 import {
   IDecideOrderProps,
+  IGetHistoryReturn,
   IOrderRepository,
   IOrderWithDetails,
   ISaveOrderResult,
@@ -114,9 +115,6 @@ export class OrderRepository implements IOrderRepository {
     idOrden,
   }: IDecideOrderProps) {
     try {
-      console.log('no se ejecuta')
-      console.log(idOrden, fecha_entrega, estado)
-
       await sequelize.query(
         `EXEC p_decidirOrden :idOrden, :fecha_entrega, :estado`,
         {
@@ -129,7 +127,37 @@ export class OrderRepository implements IOrderRepository {
         }
       );
     } catch (error) {
-      console.log('ERRR: ', error)
+      console.log("ERRR: ", error);
+      return controlError(error);
+    }
+  }
+  async getHistoryClient(idUsuario: number): Promise<IGetHistoryReturn[]> {
+    try {
+      const result = await sequelize.query(
+        `EXEC p_obtenerOrdenesPorUsuario :idUsuario`,
+        {
+          replacements: {
+            idUsuario,
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
+      const ordersMapped = result.map(
+        (
+          order:
+            | (Omit<IGetHistoryReturn, "detalles"> & { detalles: string })
+            | any
+        ) => {
+          const parsedDetails = JSON.parse(order.detalles || "[]");
+          return {
+            ...order,
+            detalles: parsedDetails,
+          } as IGetHistoryReturn;
+        }
+      );
+      return ordersMapped;
+    } catch (error) {
+      console.log("ERRR: ", error);
       return controlError(error);
     }
   }

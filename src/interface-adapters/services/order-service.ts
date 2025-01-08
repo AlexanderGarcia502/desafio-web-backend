@@ -1,6 +1,7 @@
 import { Order } from "../../entities/order";
 import { OrderDetail } from "../../entities/order-detail";
 import DecideOrder from "../../use-cases/order/decideOrder";
+import GetHistoryClient from "../../use-cases/order/getHistoryClient";
 import GetOrderList from "../../use-cases/order/getOrderList";
 import SaveOrder from "../../use-cases/order/saveOrder";
 import UpdateOrder, {
@@ -46,5 +47,12 @@ export class OrderService {
   decideOrder(decideOrderInfo: IDecideOrderProps) {
     const decideOrder = new DecideOrder(this.orderRepository, decideOrderInfo);
     return decideOrder.execute();
+  }
+  getHistoryClient(idUsuario: number) {
+    const getHistoryClient = new GetHistoryClient(
+      this.orderRepository,
+      idUsuario
+    );
+    return getHistoryClient.execute();
   }
 }
