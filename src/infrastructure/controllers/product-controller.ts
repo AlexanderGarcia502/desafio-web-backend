@@ -88,13 +88,15 @@ router.put(
       const foto = req.file ? req.file.buffer : null;
 
       await productService.update({
-        idProductos,
-        categoriaProductos_idCategoriaProductos,
-        estados_idEstados,
+        idProductos: Number(idProductos),
+        categoriaProductos_idCategoriaProductos: Number(
+          categoriaProductos_idCategoriaProductos
+        ),
+        estados_idEstados: Number(estados_idEstados),
         nombre,
         marca,
-        stock,
-        precio,
+        stock: Number(stock),
+        precio: Number(precio),
         foto,
       });
       res
