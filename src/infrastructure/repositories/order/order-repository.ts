@@ -1,6 +1,7 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../../shared/database/connect";
 import {
+  IDecideOrderProps,
   IOrderRepository,
   IOrderWithDetails,
   ISaveOrderResult,
@@ -9,7 +10,6 @@ import { Order } from "../../../entities/order";
 import { IOrderWithNullableProps } from "../../../use-cases/order/updateOrder";
 import { controlError } from "../../../../utils/controlError";
 import { OrderDetail } from "../../../entities/order-detail";
-import Product from "../../../entities/product";
 
 export class OrderRepository implements IOrderRepository {
   async getOrderList() {
@@ -31,7 +31,7 @@ export class OrderRepository implements IOrderRepository {
         );
 
         const orderDetails = parsedProduct;
-        
+
         return {
           ...order,
           detallesOrden: orderDetails,
@@ -106,6 +106,31 @@ export class OrderRepository implements IOrderRepository {
       );
     } catch (err) {
       return controlError(err);
+    }
+  }
+  async decideOrder({
+    fecha_entrega = null,
+    estado,
+    idOrden,
+  }: IDecideOrderProps) {
+    try {
+      console.log('no se ejecuta')
+      console.log(idOrden, fecha_entrega, estado)
+
+      await sequelize.query(
+        `EXEC p_decidirOrden :idOrden, :fecha_entrega, :estado`,
+        {
+          replacements: {
+            idOrden,
+            fecha_entrega,
+            estado,
+          },
+          type: QueryTypes.RAW,
+        }
+      );
+    } catch (error) {
+      console.log('ERRR: ', error)
+      return controlError(error);
     }
   }
 }

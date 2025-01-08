@@ -12,23 +12,26 @@ const orderService = new OrderService(orderRepository, orderDetailRepository);
 
 const router = Router();
 
-router.get("/getAll", async (req: Request, res: Response) => {
-  try {
-    const result = await orderService.getAll();
+router.get(
+  "/getAll",
+  JwtMiddleware.verifyToken,
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
+  async (req: Request, res: Response) => {
+    try {
+      const result = await orderService.getAll();
 
-    console.log("result order list ", result);
-
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (err) {
-    console.log("* error", err);
-    res
-      .status(400)
-      .send({ success: false, message: err?.message || "server error" });
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (err) {
+      console.log("* error", err);
+      res
+        .status(400)
+        .send({ success: false, message: err?.message || "server error" });
+    }
   }
-});
+);
 
 router.post(
   "/",
@@ -45,7 +48,6 @@ router.post(
         fecha_entrega,
         productsDetails,
       } = req.body;
-
       await orderService.save({
         usuarios_idUsuarios,
         nombre_completo,
@@ -68,6 +70,7 @@ router.post(
 router.put(
   "/",
   JwtMiddleware.verifyToken,
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
   async (req: Request, res: Response) => {
     try {
       const {
@@ -92,6 +95,26 @@ router.put(
       res
         .status(200)
         .send({ success: true, data: "Se ha actualizado la orden." });
+    } catch (err) {
+      console.log("* error", err);
+      res
+        .status(400)
+        .send({ success: false, message: err?.message || "server error" });
+    }
+  }
+);
+
+router.post(
+  "/decideOrder",
+  JwtMiddleware.verifyToken,
+  JwtMiddleware.hasRole([Roles.Admin, Roles.Operator]),
+  async (req: Request, res: Response) => {
+    try {
+      const { idOrden, fecha_entrega, estado } = req.body;
+      await orderService.decideOrder({ idOrden, fecha_entrega, estado });
+      res
+        .status(200)
+        .send({ success: true, data: "Se ha realizado la acción." });
     } catch (err) {
       console.log("* error", err);
       res

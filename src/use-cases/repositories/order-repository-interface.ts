@@ -14,8 +14,14 @@ export interface IOrderWithDetails
   detallesOrden: string;
 }
 
+export interface IDecideOrderProps extends Pick<Order, "idOrden"> {
+  fecha_entrega: Date | null;
+  estado: string;
+}
+
 export interface IOrderRepository {
   saveOrder: (order: Order) => Promise<ISaveOrderResult>;
   updateOrder: (order: IOrderWithNullableProps) => void;
   getOrderList: () => Promise<IOrderWithDetails> | any;
+  decideOrder: (props: IDecideOrderProps) => void;
 }

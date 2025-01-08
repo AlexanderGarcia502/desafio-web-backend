@@ -1,12 +1,16 @@
 import { Order } from "../../entities/order";
 import { OrderDetail } from "../../entities/order-detail";
+import DecideOrder from "../../use-cases/order/decideOrder";
 import GetOrderList from "../../use-cases/order/getOrderList";
 import SaveOrder from "../../use-cases/order/saveOrder";
 import UpdateOrder, {
   IOrderWithNullableProps,
 } from "../../use-cases/order/updateOrder";
 import { IOrderDetailRepository } from "../../use-cases/repositories/order-detail-repository-interface";
-import { IOrderRepository } from "../../use-cases/repositories/order-repository-interface";
+import {
+  IDecideOrderProps,
+  IOrderRepository,
+} from "../../use-cases/repositories/order-repository-interface";
 
 export class OrderService {
   private orderRepository: IOrderRepository;
@@ -38,5 +42,9 @@ export class OrderService {
   getAll() {
     const getAllOrders = new GetOrderList(this.orderRepository);
     return getAllOrders.execute();
+  }
+  decideOrder(decideOrderInfo: IDecideOrderProps) {
+    const decideOrder = new DecideOrder(this.orderRepository, decideOrderInfo);
+    return decideOrder.execute();
   }
 }

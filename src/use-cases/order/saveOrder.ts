@@ -30,9 +30,8 @@ export default class SaveOrder {
       direccion,
       telefono,
       correo_electronico,
-      productsDetails,
+      productsDetails = [],
     } = this.orderInfo;
-
     if (
       this.verifier.isEmpty({ value: nombre_completo }) ||
       this.verifier.isEmpty({ value: direccion }) ||
